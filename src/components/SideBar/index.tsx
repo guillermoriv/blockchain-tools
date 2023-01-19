@@ -5,6 +5,7 @@ import { useState } from 'react';
 import { FormContract } from '../FormContract';
 import { AiOutlineArrowUp } from 'react-icons/ai';
 import { clamp } from '@/utils/clamp';
+import { copyToClipboard } from '@/utils/copyToClipboard';
 
 export function SideBar() {
   const { contracts, selectedContract, removeContract, setSelectedContract } =
@@ -35,15 +36,8 @@ export function SideBar() {
                 selectedContract === contract
                   ? 'border-gray-500 shadow-md shadow-gray-500'
                   : 'border-black'
-              } rounded-md my-1 cursor-pointer`}
+              } rounded-md my-1`}
               key={contract.address}
-              onClick={() => {
-                if (selectedContract !== contract) {
-                  setSelectedContract(contract);
-                } else {
-                  setSelectedContract(null);
-                }
-              }}
             >
               <div className="flex">
                 <button
@@ -55,9 +49,27 @@ export function SideBar() {
                 >
                   Delete
                 </button>
+                <button
+                  className="border bg-green-600 text-white px-3 py-1 rounded-md"
+                  onClick={() => {
+                    if (selectedContract !== contract) {
+                      setSelectedContract(contract);
+                    } else {
+                      setSelectedContract(null);
+                    }
+                  }}
+                >
+                  Select
+                </button>
               </div>
+              <div className="border-b my-4 border-b-black" />
               <p>{contract.name}</p>
-              <p>{clamp(contract.address, 12)}</p>
+              <p
+                className="hover:underline"
+                onClick={() => copyToClipboard(contract.address)}
+              >
+                {clamp(contract.address, 12)}
+              </p>
               <p>Network: {contract.chainId}</p>
             </div>
           ))
