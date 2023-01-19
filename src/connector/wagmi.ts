@@ -1,6 +1,7 @@
 import { avalanche, bsc, goerli, mainnet, polygon } from '@wagmi/chains';
-import { Chain, configureChains, createClient } from 'wagmi';
+import { Chain, configureChains, Connector, createClient } from 'wagmi';
 import { MetaMaskConnector } from 'wagmi/connectors/metaMask';
+import { InjectedConnector } from 'wagmi/connectors/injected';
 import { WalletConnectConnector } from 'wagmi/connectors/walletConnect';
 import { publicProvider } from 'wagmi/providers/public';
 import { jsonRpcBatchProvider } from './jsonRpcBatchProvider';
@@ -95,6 +96,8 @@ const { chains, provider } = configureChains(
 
 export const metamaskConnector = new MetaMaskConnector({ chains });
 
+export const injectedConnector = new InjectedConnector({ chains });
+
 export const walletConnectConnector = new WalletConnectConnector({
   chains,
   options: {
@@ -107,3 +110,17 @@ export const client = createClient({
   connectors: [metamaskConnector, walletConnectConnector],
   provider,
 });
+
+export enum ConnectorNames {
+  Metamask = 'Metamask',
+  Injected = 'Injected',
+  WalletConnect = 'WalletConnect',
+}
+
+export const connectorsByName: {
+  [connectorName in ConnectorNames]: Connector;
+} = {
+  [ConnectorNames.Injected]: injectedConnector,
+  [ConnectorNames.Metamask]: metamaskConnector,
+  [ConnectorNames.WalletConnect]: walletConnectConnector,
+};

@@ -1,4 +1,6 @@
-import '../styles/globals.scss';
+import './../styles/global.scss';
+import { StoreProvider } from './store-provider';
+import { WagmiProvider } from './wagmi-provider';
 
 export default function RootLayout({
   children,
@@ -12,7 +14,11 @@ export default function RootLayout({
         head.tsx. Find out more at https://beta.nextjs.org/docs/api-reference/file-conventions/head
       */}
       <head />
-      <body>{children}</body>
+      <body>
+        <WagmiProvider>
+          <StoreProvider>{children}</StoreProvider>
+        </WagmiProvider>
+      </body>
     </html>
   );
 }
