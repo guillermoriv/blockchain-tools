@@ -1,11 +1,13 @@
 import { ImportedContract, useStore } from '@/app/store-provider';
 import { useEffect, useState } from 'react';
 import { useNetwork } from 'wagmi';
+import { utils } from 'ethers';
 
 export function FormContract({ close }: { close: () => void }) {
   const { addContract } = useStore();
   const { chain } = useNetwork();
 
+  const [errorAddress, setErrorAddress] = useState<boolean>(false);
   const [contract, setContract] = useState<ImportedContract>({
     name: '',
     address: '',
@@ -42,7 +44,7 @@ export function FormContract({ close }: { close: () => void }) {
       className="rounded-md border border-black p-2"
       onSubmit={handleSubmit}
     >
-      <label htmlFor="contract-name">Name</label>
+      <label htmlFor="contract-name">Name (optional)</label>
       <input
         id="contract-name"
         type="text"
@@ -60,12 +62,17 @@ export function FormContract({ close }: { close: () => void }) {
         placeholder="Address"
         className="border border-gray rounded-md p-1"
         value={contract.address}
-        onChange={(e) =>
+        onChange={(e) => {
+          setErrorAddress(false);
+
           setContract((oldState) => ({
             ...oldState,
             address: e.target.value,
-          }))
-        }
+          }));
+
+          // * we verify the address of the contract that's being imported
+          if (!utils.isAddress(e.target.value)) setErrorAddress(true);
+        }}
       />
       <label htmlFor="contract-abi">Contract ABI</label>
       <textarea
@@ -83,7 +90,20 @@ export function FormContract({ close }: { close: () => void }) {
       />
       <button
         type="submit"
-        className="rounded-md border text-white bg-black py-1 w-full"
+        className={`rounded-md border text-white  py-1 w-full ${
+          errorAddress ||
+          contract.abi.length < 30 ||
+          contract.abi.length === 0 ||
+          contract.address.length === 0
+            ? 'bg-gray-400'
+            : 'bg-black'
+        } `}
+        disabled={
+          errorAddress ||
+          contract.abi.length < 30 ||
+          contract.abi.length === 0 ||
+          contract.address.length === 0
+        }
       >
         Import
       </button>

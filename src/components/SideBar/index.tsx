@@ -18,7 +18,9 @@ export function SideBar() {
       >
         Import a contract
         <AiOutlineArrowUp
-          style={{ transform: `${importOpen ? 'rotate(180deg)' : ''}` }}
+          style={{
+            transform: `${importOpen ? 'rotate(180deg)' : 'rotate(0deg)'}`,
+          }}
         />
       </div>
       {importOpen && <FormContract close={() => setImportOpen(false)} />}

@@ -10,31 +10,31 @@ const networks: { [chainId: number]: Chain } = {
   1: {
     ...mainnet,
     rpcUrls: {
-      default: { http: [String(process.env.REACT_APP_ETH)] },
+      default: { http: [String(process.env.NEXT_PUBLIC_ETH)] },
     },
   },
   5: {
     ...goerli,
     rpcUrls: {
-      default: { http: [String(process.env.REACT_APP_GOERLI)] },
+      default: { http: [String(process.env.NEXT_PUBLIC_GOERLI)] },
     },
   },
   56: {
     ...bsc,
     rpcUrls: {
-      default: { http: [String(process.env.REACT_APP_BSC)] },
+      default: { http: [String(process.env.NEXT_PUBLIC_BSC)] },
     },
   },
   137: {
     ...polygon,
     rpcUrls: {
-      default: { http: [String(process.env.REACT_APP_MATIC)] },
+      default: { http: [String(process.env.NEXT_PUBLIC_MATIC)] },
     },
   },
   43_114: {
     ...avalanche,
     rpcUrls: {
-      default: { http: [String(process.env.REACT_APP_AVALANCHE)] },
+      default: { http: [String(process.env.NEXT_PUBLIC_AVALANCHE)] },
     },
   },
   246: {
@@ -47,7 +47,7 @@ const networks: { [chainId: number]: Chain } = {
       symbol: 'EWT',
     },
     rpcUrls: {
-      default: { http: [String(process.env.REACT_APP_EWC)] },
+      default: { http: [String(process.env.NEXT_PUBLIC_EWC)] },
     },
     blockExplorers: {
       etherscan: {
@@ -70,7 +70,7 @@ const networks: { [chainId: number]: Chain } = {
       symbol: 'DEV',
     },
     rpcUrls: {
-      default: { http: [String(process.env.REACT_APP_MOONBEAM)] },
+      default: { http: [String(process.env.NEXT_PUBLIC_MOONBEAM)] },
     },
     blockExplorers: {
       etherscan: { name: 'Moonscan', url: 'https://moonscan.io' },
@@ -78,6 +78,8 @@ const networks: { [chainId: number]: Chain } = {
     },
   },
 };
+
+console.log(networks);
 
 const POLLING_INTERVAL = 12_000;
 

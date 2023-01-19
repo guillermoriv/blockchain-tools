@@ -4,5 +4,8 @@ module.exports = {
   theme: {
     extend: {},
   },
+  groupVariants: {
+    'collapsable-expanded': ['collapsable', 'expanded', '.expanded'],
+  },
   plugins: [],
 };
