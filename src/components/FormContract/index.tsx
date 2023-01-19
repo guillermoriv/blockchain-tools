@@ -1,8 +1,10 @@
 import { ImportedContract, useStore } from '@/app/store-provider';
 import { useEffect, useState } from 'react';
+import { useNetwork } from 'wagmi';
 
 export function FormContract({ close }: { close: () => void }) {
   const { addContract } = useStore();
+  const { chain } = useNetwork();
 
   const [contract, setContract] = useState<ImportedContract>({
     name: '',
@@ -12,6 +14,13 @@ export function FormContract({ close }: { close: () => void }) {
   });
 
   useEffect(() => {
+    if (chain) {
+      setContract((oldState) => ({
+        ...oldState,
+        chainId: chain.id,
+      }));
+    }
+
     return () => {
       setContract({
         name: '',
@@ -20,7 +29,7 @@ export function FormContract({ close }: { close: () => void }) {
         chainId: 0,
       });
     };
-  }, []);
+  }, [chain]);
 
   function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
