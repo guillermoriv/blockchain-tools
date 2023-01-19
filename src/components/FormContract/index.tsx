@@ -41,7 +41,7 @@ export function FormContract({ close }: { close: () => void }) {
 
   return (
     <form
-      className="rounded-md border border-black p-2"
+      className="rounded-md border border-black p-2 flex flex-col"
       onSubmit={handleSubmit}
     >
       <label htmlFor="contract-name">Name (optional)</label>
