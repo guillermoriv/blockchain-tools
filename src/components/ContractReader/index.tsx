@@ -1,7 +1,7 @@
 'use client';
 
 import { useStore } from '@/app/store-provider';
-import { useNetwork, useProvider } from 'wagmi';
+import { useNetwork } from 'wagmi';
 import { utils } from 'ethers';
 import { useEffect, useState } from 'react';
 import { PropertiesReader } from '../PropertiesReader';
@@ -16,7 +16,6 @@ enum FilterReader {
 // * main component for reading data from the contract
 export function ContractReader() {
   const { chain } = useNetwork();
-  const provider = useProvider();
   const { selectedContract } = useStore();
 
   const [filter, setFilter] = useState<FilterReader>(FilterReader.PROPERTIES);
@@ -38,7 +37,7 @@ export function ContractReader() {
   }, [selectedContract]);
 
   return selectedContract && contractIFace ? (
-    <div className="container p-8 overflow-auto">
+    <div className="container h-screen p-8 overflow-auto">
       {chain && chain.id === selectedContract.chainId ? (
         <div>
           <span>This is the current selected contract:</span>
@@ -90,7 +89,7 @@ export function ContractReader() {
       )}
     </div>
   ) : (
-    <div className="container p-8">
+    <div className="container h-screen p-8">
       <p>No contract selected.</p>
       <p>
         Before using the application you need to select a saved contract or

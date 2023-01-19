@@ -55,6 +55,20 @@ export function FormContract({ close }: { close: () => void }) {
           setContract((oldState) => ({ ...oldState, name: e.target.value }))
         }
       />
+      <label htmlFor="contract-chain">Chain (optional)</label>
+      <input
+        id="contract-chain"
+        type="text"
+        placeholder="Contract Chain"
+        className="border border-gray rounded-md p-1"
+        value={contract.chainId}
+        onChange={(e) =>
+          setContract((oldState) => ({
+            ...oldState,
+            chainId: parseInt(e.target.value !== '' ? e.target.value : '0'),
+          }))
+        }
+      />
       <label htmlFor="contract-address">Address</label>
       <input
         id="contract-address"
@@ -94,6 +108,7 @@ export function FormContract({ close }: { close: () => void }) {
           errorAddress ||
           contract.abi.length < 30 ||
           contract.abi.length === 0 ||
+          contract.chainId === 0 ||
           contract.address.length === 0
             ? 'bg-gray-400'
             : 'bg-black'
@@ -102,6 +117,7 @@ export function FormContract({ close }: { close: () => void }) {
           errorAddress ||
           contract.abi.length < 30 ||
           contract.abi.length === 0 ||
+          contract.chainId === 0 ||
           contract.address.length === 0
         }
       >

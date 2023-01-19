@@ -30,14 +30,14 @@ export function SideBar() {
       <div>
         <span>Imported Contracts:</span>
         {contracts.length > 0 ? (
-          contracts.map((contract) => (
+          contracts.map((contract, idx) => (
             <div
               className={`p-4 border ${
                 selectedContract === contract
                   ? 'border-gray-500 shadow-md shadow-gray-500'
                   : 'border-black'
               } rounded-md my-1`}
-              key={contract.address}
+              key={idx}
             >
               <div className="flex">
                 <button
