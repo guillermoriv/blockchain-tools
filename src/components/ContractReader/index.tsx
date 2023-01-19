@@ -83,12 +83,19 @@ export function ContractReader() {
               contractIFace={contractIFace}
             />
           )}
+          {filter === FilterReader.WRITE && <div>Work in Progress.</div>}
         </div>
       ) : (
         <div>Please switch to the correct network to read this contract.</div>
       )}
     </div>
   ) : (
-    <div className="container p-8">No contract selected</div>
+    <div className="container p-8">
+      <p>No contract selected.</p>
+      <p>
+        Before using the application you need to select a saved contract or
+        either import one.
+      </p>
+    </div>
   );
 }

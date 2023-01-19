@@ -20,7 +20,6 @@ function Call({
   const [inputs, setInputs] = useState<string[]>(
     new Array(property.inputs.length).fill(''),
   );
-  console.log(property);
 
   async function callRead() {
     try {

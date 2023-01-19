@@ -79,8 +79,6 @@ const networks: { [chainId: number]: Chain } = {
   },
 };
 
-console.log(networks);
-
 const POLLING_INTERVAL = 12_000;
 
 const { chains, provider } = configureChains(

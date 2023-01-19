@@ -4,6 +4,7 @@ import { useStore } from '@/app/store-provider';
 import { useState } from 'react';
 import { FormContract } from '../FormContract';
 import { AiOutlineArrowUp } from 'react-icons/ai';
+import { clamp } from '@/utils/clamp';
 
 export function SideBar() {
   const { contracts, selectedContract, removeContract, setSelectedContract } =
@@ -30,9 +31,9 @@ export function SideBar() {
         {contracts.length > 0 ? (
           contracts.map((contract) => (
             <div
-              className={`p-2 border ${
+              className={`p-4 border ${
                 selectedContract === contract
-                  ? 'border-blue-600'
+                  ? 'border-gray-500 shadow-md shadow-gray-500'
                   : 'border-black'
               } rounded-md my-1 cursor-pointer`}
               key={contract.address}
@@ -44,9 +45,9 @@ export function SideBar() {
                 }
               }}
             >
-              <div>
+              <div className="flex">
                 <button
-                  className="border p-1"
+                  className="border bg-red-600 text-white px-3 py-1 rounded-md"
                   onClick={() => {
                     removeContract(contract);
                     setSelectedContract(null);
@@ -55,7 +56,9 @@ export function SideBar() {
                   Delete
                 </button>
               </div>
-              <span>{contract.name}</span>
+              <p>{contract.name}</p>
+              <p>{clamp(contract.address, 12)}</p>
+              <p>Network: {contract.chainId}</p>
             </div>
           ))
         ) : (
