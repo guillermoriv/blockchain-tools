@@ -2,10 +2,11 @@
 
 import style from './../../styles/components/WalletButton.module.scss';
 import { connectorsByName } from '@/connector/wagmi';
-import { useAccount, useConnect } from 'wagmi';
+import { useAccount, useConnect, useDisconnect } from 'wagmi';
 import clsx from 'clsx';
 import { clamp } from '@/utils/clamp';
 import { useEffect, useState } from 'react';
+import { copyToClipboard } from '@/utils/copyToClipboard';
 
 export function WalletButton() {
   const { connect, isLoading } = useConnect();
@@ -18,7 +19,12 @@ export function WalletButton() {
 
   return !rendering ? (
     isConnected ? (
-      <div className={style.connect_btn}>{clamp(address as string, 12)}</div>
+      <div
+        className={style.connect_btn}
+        onClick={() => copyToClipboard(address!)}
+      >
+        {clamp(address as string, 12)}
+      </div>
     ) : (
       <div
         className={clsx(isLoading && style.loading, style.connect_btn)}

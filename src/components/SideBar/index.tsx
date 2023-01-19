@@ -44,7 +44,8 @@ export function SideBar() {
                   className="border bg-red-600 text-white px-3 py-1 rounded-md"
                   onClick={() => {
                     removeContract(contract);
-                    setSelectedContract(null);
+                    if (selectedContract === contract)
+                      setSelectedContract(null);
                   }}
                 >
                   Delete
@@ -65,7 +66,7 @@ export function SideBar() {
               <div className="border-b my-4 border-b-black" />
               <p>{contract.name}</p>
               <p
-                className="hover:underline"
+                className="hover:underline hover:cursor-pointer"
                 onClick={() => copyToClipboard(contract.address)}
               >
                 {clamp(contract.address, 12)}

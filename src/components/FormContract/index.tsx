@@ -92,6 +92,7 @@ export function FormContract({ close }: { close: () => void }) {
       <textarea
         id="contract-abi"
         name="contract-abi"
+        className="border border-gray rounded-md p-1"
         rows={4}
         cols={20}
         value={contract.abi}
@@ -104,7 +105,7 @@ export function FormContract({ close }: { close: () => void }) {
       />
       <button
         type="submit"
-        className={`rounded-md border text-white  py-1 w-full ${
+        className={`mt-4 rounded-md border text-white  py-1 w-full ${
           errorAddress ||
           contract.abi.length < 30 ||
           contract.abi.length === 0 ||

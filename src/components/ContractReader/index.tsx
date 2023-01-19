@@ -1,11 +1,12 @@
 'use client';
 
 import { useStore } from '@/app/store-provider';
-import { useNetwork } from 'wagmi';
+import { useAccount, useNetwork } from 'wagmi';
 import { utils } from 'ethers';
 import { useEffect, useState } from 'react';
 import { PropertiesReader } from '../PropertiesReader';
 import { CallReader } from '../CallReader';
+import { WriteReader } from '../WriteReader';
 
 enum FilterReader {
   READ = 'read',
@@ -16,6 +17,7 @@ enum FilterReader {
 // * main component for reading data from the contract
 export function ContractReader() {
   const { chain } = useNetwork();
+  const { isConnected } = useAccount();
   const { selectedContract } = useStore();
 
   const [filter, setFilter] = useState<FilterReader>(FilterReader.PROPERTIES);
@@ -38,7 +40,11 @@ export function ContractReader() {
 
   return selectedContract && contractIFace ? (
     <div className="container h-screen p-8 overflow-auto">
-      {chain && chain.id === selectedContract.chainId ? (
+      {!isConnected ? (
+        <div>
+          Please connect to the application to use the imported contract.
+        </div>
+      ) : chain && chain.id === selectedContract.chainId ? (
         <div>
           <span>This is the current selected contract:</span>
           <span className="border border-black p-2 ml-2 rounded-md">
@@ -82,7 +88,12 @@ export function ContractReader() {
               contractIFace={contractIFace}
             />
           )}
-          {filter === FilterReader.WRITE && <div>Work in Progress.</div>}
+          {filter === FilterReader.WRITE && (
+            <WriteReader
+              selectedContract={selectedContract}
+              contractIFace={contractIFace}
+            />
+          )}
         </div>
       ) : (
         <div>Please switch to the correct network to read this contract.</div>
