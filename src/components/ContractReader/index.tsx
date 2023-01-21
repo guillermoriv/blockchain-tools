@@ -7,6 +7,7 @@ import { useEffect, useState } from 'react';
 import { PropertiesReader } from '../PropertiesReader';
 import { CallReader } from '../CallReader';
 import { WriteReader } from '../WriteReader';
+import { copyToClipboard } from '@/utils/copyToClipboard';
 
 enum FilterReader {
   READ = 'read',
@@ -47,7 +48,10 @@ export function ContractReader() {
       ) : chain && chain.id === selectedContract.chainId ? (
         <div>
           <span>This is the current selected contract:</span>
-          <span className="border border-black p-2 ml-2 rounded-md">
+          <span
+            className="border border-black hover:bg-black hover:cursor-pointer hover:text-white p-2 ml-2 rounded-md"
+            onClick={() => copyToClipboard(selectedContract.address)}
+          >
             {selectedContract.address}
           </span>
           <ul className="flex my-6">
