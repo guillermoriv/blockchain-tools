@@ -1,6 +1,6 @@
 'use client';
 
-import { useStore } from '@/app/store-provider';
+import { ImportedContract, useStore } from '@/app/store-provider';
 import { useState } from 'react';
 import { FormContract } from '../FormContract';
 import { AiOutlineArrowUp } from 'react-icons/ai';
@@ -11,12 +11,18 @@ export function SideBar() {
   const { contracts, selectedContract, removeContract, setSelectedContract } =
     useStore();
   const [importOpen, setImportOpen] = useState<boolean>(false);
+  const [pastContract, setPastContract] = useState<ImportedContract | null>(
+    null,
+  );
 
   return (
     <>
       <div
         className="rounded-md border border-black p-2 cursor-pointer mb-2 flex items-center justify-between"
-        onClick={() => setImportOpen(!importOpen)}
+        onClick={() => {
+          setImportOpen(!importOpen);
+          setPastContract(null);
+        }}
       >
         Import a contract
         <AiOutlineArrowUp
@@ -25,7 +31,12 @@ export function SideBar() {
           }}
         />
       </div>
-      {importOpen && <FormContract close={() => setImportOpen(false)} />}
+      {importOpen && (
+        <FormContract
+          close={() => setImportOpen(false)}
+          pastContract={pastContract}
+        />
+      )}
       <div className="mb-14" />
       <div>
         <span>Imported Contracts:</span>
@@ -61,6 +72,19 @@ export function SideBar() {
                   }}
                 >
                   Select
+                </button>
+                <button
+                  className="border bg-blue-400 text-white px-3 py-1 rounded-md"
+                  onClick={() => {
+                    if (pastContract !== contract) {
+                      setPastContract(contract);
+                    } else {
+                      setPastContract(null);
+                    }
+                    setImportOpen(!importOpen);
+                  }}
+                >
+                  Edit
                 </button>
               </div>
               <div className="border-b my-4 border-b-black" />

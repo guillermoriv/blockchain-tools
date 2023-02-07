@@ -3,17 +3,27 @@ import { useEffect, useState } from 'react';
 import { useNetwork } from 'wagmi';
 import { utils } from 'ethers';
 
-export function FormContract({ close }: { close: () => void }) {
-  const { addContract } = useStore();
+export function FormContract({
+  close,
+  pastContract,
+}: {
+  close: () => void;
+  pastContract: ImportedContract | null;
+}) {
+  const { addContract, editContract } = useStore();
   const { chain } = useNetwork();
 
   const [errorAddress, setErrorAddress] = useState<boolean>(false);
-  const [contract, setContract] = useState<ImportedContract>({
-    name: '',
-    address: '',
-    abi: '',
-    chainId: 0,
-  });
+  const [contract, setContract] = useState<ImportedContract>(
+    pastContract || {
+      name: '',
+      address: '',
+      abi: '',
+      chainId: 0,
+    },
+  );
+
+  const originalContract = pastContract;
 
   useEffect(() => {
     if (chain) {
@@ -24,18 +34,23 @@ export function FormContract({ close }: { close: () => void }) {
     }
 
     return () => {
-      setContract({
-        name: '',
-        address: '',
-        abi: '',
-        chainId: 0,
-      });
+      if (!pastContract)
+        setContract({
+          name: '',
+          address: '',
+          abi: '',
+          chainId: 0,
+        });
     };
-  }, [chain]);
+  }, [chain, pastContract]);
 
   function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    addContract(contract);
+    if (pastContract && originalContract) {
+      editContract(originalContract, contract);
+    } else {
+      addContract(contract);
+    }
     close();
   }
 
@@ -122,7 +137,7 @@ export function FormContract({ close }: { close: () => void }) {
           contract.address.length === 0
         }
       >
-        Import
+        {pastContract ? 'Edit' : 'Add'} Contract
       </button>
     </form>
   );

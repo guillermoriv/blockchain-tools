@@ -12,6 +12,10 @@ export interface ImportedContract {
 interface Store {
   contracts: ImportedContract[];
   addContract: (contract: ImportedContract) => void;
+  editContract: (
+    contract: ImportedContract,
+    editedContract: ImportedContract,
+  ) => void;
   removeContract: (contract: ImportedContract) => void;
 
   selectedContract: ImportedContract | null;
@@ -39,7 +43,16 @@ function StoreProvider({ children }: { children: React.ReactNode }) {
   function addContract(contract: ImportedContract) {
     const copy = [...contracts, contract];
     setContracts(copy);
+    saveContracts(copy);
+  }
 
+  function editContract(
+    contract: ImportedContract,
+    editedContract: ImportedContract,
+  ) {
+    const copy = [...contracts];
+    copy[copy.indexOf(contract)] = editedContract;
+    setContracts(copy);
     saveContracts(copy);
   }
 
@@ -47,7 +60,6 @@ function StoreProvider({ children }: { children: React.ReactNode }) {
     const copy = [...contracts];
     copy.splice(copy.indexOf(contract), 1);
     setContracts(copy);
-
     saveContracts(copy);
   }
 
@@ -55,6 +67,7 @@ function StoreProvider({ children }: { children: React.ReactNode }) {
     contracts,
     addContract,
     removeContract,
+    editContract,
 
     selectedContract,
     setSelectedContract,
