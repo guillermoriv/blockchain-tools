@@ -1,7 +1,7 @@
 'use client';
 
 import { ImportedContract, useStore } from '@/app/store-provider';
-import { useState } from 'react';
+import { MouseEvent, useState } from 'react';
 import { FormContract } from '../FormContract';
 import { AiOutlineArrowUp } from 'react-icons/ai';
 import { clamp } from '@/utils/clamp';
@@ -15,14 +15,16 @@ export function SideBar() {
     null,
   );
 
+  const handleImport = (_: MouseEvent<HTMLElement>) => {
+    setImportOpen(!importOpen);
+    setPastContract(null);
+  };
+
   return (
     <>
-      <div
-        className="rounded-md border border-black p-2 cursor-pointer mb-2 flex items-center justify-between"
-        onClick={() => {
-          setImportOpen(!importOpen);
-          setPastContract(null);
-        }}
+      <button
+        className="rounded-md border border-black p-2 cursor-pointer mb-2 flex items-center justify-between w-full transition-all"
+        onClick={handleImport}
       >
         Import a contract
         <AiOutlineArrowUp
@@ -30,7 +32,7 @@ export function SideBar() {
             transform: `${importOpen ? 'rotate(180deg)' : 'rotate(0deg)'}`,
           }}
         />
-      </div>
+      </button>
       {importOpen && (
         <FormContract
           close={() => setImportOpen(false)}
