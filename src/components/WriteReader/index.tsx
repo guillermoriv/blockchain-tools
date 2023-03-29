@@ -1,10 +1,8 @@
 import { ImportedContract } from '@/app/store-provider';
 import { copyToClipboard } from '@/utils/copyToClipboard';
-import { toFormat, toStringFormat } from '@/utils/format';
 import { useMutation } from '@tanstack/react-query';
 import {
   Contract,
-  ContractFunction,
   ContractReceipt,
   ContractTransaction,
   providers,
