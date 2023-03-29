@@ -1,6 +1,6 @@
 import { currencies, networks } from '@/constants';
 
-export const fetchFiatRates = async () => {
+export const fetchFiatRates = async (): Promise<any> => {
   const ids = networks.map((network) => network.coinGeckoId).join(',');
   const vsCurrencies = currencies.join(',');
 
@@ -10,9 +10,19 @@ export const fetchFiatRates = async () => {
       { next: { revalidate: 300 } },
     );
 
-    const data = await response.json();
-    return data;
+    return await response.json();
   } catch (error) {
     console.log(error);
   }
+
+  return networks.reduce(
+    (acc, n) => ({
+      ...acc,
+      [n.coinGeckoId]: currencies.reduce(
+        (acc, cur) => ({ ...acc, [cur.toLocaleLowerCase()]: 0 }),
+        {},
+      ),
+    }),
+    {},
+  );
 };
