@@ -10,16 +10,7 @@ async function fetchGasNetwork(network: string) {
   });
 
   if (gasPriceResponse.status === 200) {
-    try {
-      return await gasPriceResponse.json();
-    } catch (e) {
-      return {
-        eip1559: false,
-        standard: 0,
-        fast: 0,
-        instant: 0,
-      };
-    }
+    return await gasPriceResponse.json();
   }
 
   return {
