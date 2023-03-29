@@ -1,5 +1,5 @@
 import { ImportedContract, useStore } from '@/app/store-provider';
-import { useEffect, useState } from 'react';
+import { MouseEvent, useEffect, useState } from 'react';
 import { useNetwork } from 'wagmi';
 import { utils } from 'ethers';
 
