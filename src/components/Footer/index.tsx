@@ -1,7 +1,9 @@
+import { RiShieldKeyholeLine } from 'react-icons/ri';
+
 export function Footer() {
   return (
     <div className="flex p-4 justify-between items-center border-t border-t-black">
-      <div className="flex">
+      <div>
         <span>Made by</span>
         <a
           href="https://github.com/guillermoriv"
@@ -11,6 +13,9 @@ export function Footer() {
         >
           @guillermoriv
         </a>
+      </div>
+      <div className="text-3xl bold flex items-center">
+        Blockchain Tools <RiShieldKeyholeLine className="ml-3" size={40} />
       </div>
     </div>
   );
