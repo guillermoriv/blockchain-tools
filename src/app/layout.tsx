@@ -1,4 +1,5 @@
 import './../styles/global.scss';
+import { GasProvider } from './gas-provider';
 import { QueryProvider } from './query-provider';
 import { StoreProvider } from './store-provider';
 import { WagmiProvider } from './wagmi-provider';
@@ -18,7 +19,9 @@ export default function RootLayout({
       <body>
         <WagmiProvider>
           <QueryProvider>
-            <StoreProvider>{children}</StoreProvider>
+            <GasProvider>
+              <StoreProvider>{children}</StoreProvider>
+            </GasProvider>
           </QueryProvider>
         </WagmiProvider>
       </body>
