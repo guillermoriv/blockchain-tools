@@ -10,6 +10,8 @@ export const fetchFiatRates = async (): Promise<any> => {
       { next: { revalidate: 300 } },
     );
 
+    console.log(response);
+
     if (response.status === 200) {
       return await response.json();
     }
