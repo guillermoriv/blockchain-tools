@@ -14,7 +14,6 @@ import { MetaMaskConnector } from 'wagmi/connectors/metaMask';
 import { InjectedConnector } from 'wagmi/connectors/injected';
 import { WalletConnectConnector } from 'wagmi/connectors/walletConnect';
 import { publicProvider } from 'wagmi/providers/public';
-import { jsonRpcBatchProvider } from './jsonRpcBatchProvider';
 
 const POLLING_INTERVAL = 12_000;
 
@@ -30,12 +29,7 @@ const { chains, provider } = configureChains(
     bscTestnet,
     sepolia,
   ],
-  [
-    jsonRpcBatchProvider({
-      rpc: (chain) => ({ http: chain.rpcUrls.default.http[0] }),
-    }),
-    publicProvider(),
-  ],
+  [publicProvider()],
   {
     pollingInterval: POLLING_INTERVAL,
   },

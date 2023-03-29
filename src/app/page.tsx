@@ -6,7 +6,7 @@ import { SideBar } from '@/components/SideBar';
 export default function Page() {
   return (
     <main className="flex max-h-screen max-w-screen">
-      <div className="w-80 h-screen border-r border-r-black p-4">
+      <div className="w-1/3 h-screen border-r border-r-black p-4">
         <SideBar />
       </div>
       <div className="container flex flex-col">

@@ -24,7 +24,7 @@ export function CurrencyInput({ currencies }: CurrencyInputProps) {
 
   return (
     <>
-      <div className="col-span-1 sm:col-span-1">
+      <div className="col-span-1">
         <label className="text-text-base-content/80 block text-sm font-medium">
           Currency
         </label>

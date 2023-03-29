@@ -3,11 +3,31 @@
 import { useGasContext } from '@/app/gas-provider';
 import clsx from 'clsx';
 import Image from 'next/image';
+import { ChangeEvent, useState } from 'react';
 
 type TableProps = { networkPrices: any };
 
 export function Table({ networkPrices }: TableProps) {
   const { currency, usedGas, gasPrice } = useGasContext();
+  const [networkPricesData, setNetworkPricesData] = useState(networkPrices);
+
+  const onChangeInput = (e: ChangeEvent<HTMLInputElement>, index: number) => {
+    const { name, value } = e.target;
+
+    const editData = networkPricesData.map((n: any, idx: number) =>
+      idx === index && name
+        ? {
+            ...n,
+            [name]: {
+              ...n[name],
+              [name === 'gasPrice' ? gasPrice : currency]: Number(value),
+            },
+          }
+        : n,
+    );
+
+    setNetworkPricesData(editData);
+  };
 
   return (
     <div className="mt-8 mb-8 flex flex-col overflow-y-auto">
@@ -55,7 +75,7 @@ export function Table({ networkPrices }: TableProps) {
               </tr>
             </thead>
             <tbody className="divide-y divide-base-300 bg-base-100">
-              {networkPrices.map((network: any) => (
+              {networkPricesData.map((network: any, idx: number) => (
                 <tr key={network?.website}>
                   <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm sm:pl-6">
                     <div className="flex items-center">
@@ -102,7 +122,15 @@ export function Table({ networkPrices }: TableProps) {
                       {network.symbol}
                     </div>
                     <div className="text-sm text-base-content/80">
-                      {network.tokenPrice[currency.toLocaleLowerCase()]}{' '}
+                      <input
+                        className="w-24"
+                        name="tokenPrice"
+                        value={network.tokenPrice[currency.toLocaleLowerCase()]}
+                        type="number"
+                        inputMode="numeric"
+                        onChange={(e) => onChangeInput(e, idx)}
+                        placeholder="Type Value"
+                      />
                       {currency}
                     </div>
                   </td>
@@ -115,7 +143,15 @@ export function Table({ networkPrices }: TableProps) {
                       {gasPrice}
                     </div>
                     <div className="text-sm text-base-content/80">
-                      {/* {network.gasPrice[gasPrice]} */}
+                      <input
+                        className="w-10"
+                        name="gasPrice"
+                        value={network.gasPrice[gasPrice.toLocaleLowerCase()]}
+                        type="number"
+                        inputMode="numeric"
+                        onChange={(e) => onChangeInput(e, idx)}
+                        placeholder="Type Value"
+                      />
                     </div>
                   </td>
                   <td className="whitespace-nowrap px-6 py-4 text-sm font-bold text-base-content">

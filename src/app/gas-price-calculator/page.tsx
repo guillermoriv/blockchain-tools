@@ -34,7 +34,7 @@ export default async function Page() {
 
   return (
     <main className="flex max-h-screen max-w-screen">
-      <div className="w-2/5 h-screen border-r border-r-black p-4">
+      <div className="w-1/3 h-screen border-r border-r-black p-4">
         <Card
           title="Local Currency"
           description="Select the currency you want the fees to be displayed in."
