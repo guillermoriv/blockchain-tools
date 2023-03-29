@@ -8,14 +8,17 @@ async function fetchGasNetwork(network: string) {
   const gasPriceResponse = await fetch(url, {
     next: { revalidate: 300 },
   });
-  try {
-    const data = await gasPriceResponse.json();
-    return data;
-  } catch (e) {
-    console.log(e);
+
+  if (gasPriceResponse.status === 200) {
+    return await gasPriceResponse.json();
   }
 
-  return null;
+  return {
+    eip1559: false,
+    standard: 0,
+    fast: 0,
+    instant: 0,
+  };
 }
 
 export const fetchGasPrices = async () => {
@@ -26,10 +29,15 @@ export const fetchGasPrices = async () => {
   }
 
   try {
-    const requests = Promise.all(promises);
-    const data = await requests;
-    return data;
+    return await Promise.all(promises);
   } catch (e) {
     console.log(e);
   }
+
+  return networks.map(() => ({
+    eip1559: false,
+    standard: 0,
+    fast: 0,
+    instant: 0,
+  }));
 };
