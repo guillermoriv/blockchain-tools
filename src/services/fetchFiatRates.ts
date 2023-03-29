@@ -5,16 +5,16 @@ export const fetchFiatRates = async (): Promise<any> => {
   const vsCurrencies = currencies.join(',');
 
   try {
-    const response = await fetch(
-      `https://api.coingecko.com/api/v3/simple/price?ids=${ids}&vs_currencies=${vsCurrencies}`,
-      { next: { revalidate: 300 } },
-    );
+    // const response = await fetch(
+    //   `https://api.coingecko.com/api/v3/simple/price?ids=${ids}&vs_currencies=${vsCurrencies}`,
+    //   { next: { revalidate: 300 } },
+    // );
 
-    if (response.status === 200) {
-      return await response.json();
-    }
+    // if (response.status === 200) {
+    //   return await response.json();
+    // }
 
-    throw new Error(response.statusText);
+    throw new Error('error');
   } catch (error) {
     console.log(error);
   }

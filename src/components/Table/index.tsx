@@ -13,6 +13,10 @@ export function Table({ networkPrices }: TableProps) {
 
   const onChangeInput = (e: ChangeEvent<HTMLInputElement>, index: number) => {
     const { name, value } = e.target;
+    const editName =
+      name === 'gasPrice'
+        ? gasPrice.toLocaleLowerCase()
+        : currency.toLocaleLowerCase();
 
     const editData = networkPricesData.map((n: any, idx: number) =>
       idx === index && name
@@ -20,7 +24,7 @@ export function Table({ networkPrices }: TableProps) {
             ...n,
             [name]: {
               ...n[name],
-              [name === 'gasPrice' ? gasPrice : currency]: Number(value),
+              [editName]: Number(value),
             },
           }
         : n,
