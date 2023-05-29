@@ -8,6 +8,8 @@ import {
   arbitrum,
   bscTestnet,
   sepolia,
+  arbitrumGoerli,
+  moonbeam,
 } from '@wagmi/chains';
 import { configureChains, Connector, createClient } from 'wagmi';
 import { MetaMaskConnector } from 'wagmi/connectors/metaMask';
@@ -28,6 +30,8 @@ const { chains, provider } = configureChains(
     arbitrum,
     bscTestnet,
     sepolia,
+    arbitrumGoerli,
+    moonbeam,
   ],
   [publicProvider()],
   {
