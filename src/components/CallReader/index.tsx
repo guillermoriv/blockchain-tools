@@ -1,5 +1,4 @@
 import { ImportedContract } from '@/app/store-provider';
-import { toFormat } from '@/utils/format';
 import { useState } from 'react';
 import { MdExpandLess, MdExpandMore } from 'react-icons/md';
 import { Collapsable } from '../Collapsable';
@@ -9,68 +8,76 @@ import { useContractRead } from 'wagmi';
 import { parseAbiStringToJson } from '@/utils/parseAbiStringToJson';
 import { Abi } from 'viem';
 import { Tooltip } from 'react-tooltip';
+import { toFormat } from '@/utils/format';
 
-function DisplayData({ data }: { data: any }) {
-  const renderData = () => {
+function RenderData({ data }: { data: any }) {
+  return (
+    <div
+      className="px-2 py-1 rounded-md bg-gray-100 text-sm text-gray-700"
+      onClick={(e) => {
+        const currentTarget = e.currentTarget;
+
+        currentTarget.setAttribute('data-tooltip-content', 'Copied!');
+
+        navigator.clipboard
+          .writeText(data)
+          .then(() =>
+            setTimeout(
+              () =>
+                currentTarget.setAttribute(
+                  'data-tooltip-content',
+                  'Copy transaction hash',
+                ),
+              1500,
+            ),
+          )
+          .catch((err) => {
+            console.error('Could not copy text: ', err);
+          });
+      }}
+      data-tooltip-id="copy-data"
+      data-tooltip-content="Copy"
+    >
+      {toFormat(data)}
+      <Tooltip id="copy-data" />
+    </div>
+  );
+}
+
+function DisplayData({ data, property }: { data: any; property: ParsedAbi }) {
+  const { outputs } = property;
+
+  if (outputs && outputs.length > 1) {
     if (Array.isArray(data)) {
       return (
-        <ul className="space-y-1">
-          {data.map((value, index) => (
-            <li key={index} className="text-sm text-gray-700">
-              <DisplayData data={value} />
-            </li>
+        <div className="flex flex-col">
+          {data.map((item, index) => (
+            <div key={index} className="flex">
+              <div className="flex-1">
+                <div className="flex flex-row">
+                  <div className="flex-1">{outputs[index].name}</div>
+                  <div className="flex-1 justify-center items-center">
+                    <RenderData data={item} />
+                  </div>
+                </div>
+              </div>
+            </div>
           ))}
-        </ul>
+        </div>
       );
     }
 
-    if (typeof data === 'object' && data !== null) {
-      return (
-        <ul className="space-y-1">
-          {Object.keys(data).map((key) => (
-            <li key={key} className="text-sm text-gray-700">
-              <strong className="font-semibold">{key}: </strong>
-              <DisplayData data={data[key]} />
-            </li>
-          ))}
-        </ul>
-      );
-    }
-
-    return (
-      <div
-        className="px-2 py-1 rounded-md bg-gray-100 text-sm text-gray-700"
-        onClick={(e) => {
-          const currentTarget = e.currentTarget;
-
-          currentTarget.setAttribute('data-tooltip-content', 'Copied!');
-
-          navigator.clipboard
-            .writeText(data)
-            .then(() =>
-              setTimeout(
-                () =>
-                  currentTarget.setAttribute(
-                    'data-tooltip-content',
-                    'Copy transaction hash',
-                  ),
-                1500,
-              ),
-            )
-            .catch((err) => {
-              console.error('Could not copy text: ', err);
-            });
-        }}
-        data-tooltip-id="copy-data"
-        data-tooltip-content="Copy"
-      >
-        {data}
-        <Tooltip id="copy-data" />
+    return outputs.map((output, outputIndex) => (
+      <div key={outputIndex} className="flex flex-row">
+        <div className="flex-1">{output.name}</div>
+        <div className="flex-1">
+          <RenderData data={data[output.name]} />
+        </div>
       </div>
-    );
-  };
+    ));
+  }
 
-  return <div>{renderData()}</div>;
+  return <RenderData data={data} />;
 }
 
 type CallProps = {
@@ -146,7 +153,7 @@ function Call({ property, address, typedAbi }: CallProps) {
 
         <hr className="border-t border-gray-200 my-2" />
 
-        {outputP && <DisplayData data={outputP} />}
+        {outputP && <DisplayData data={outputP} property={property} />}
         {error && <div>{error.message}</div>}
       </div>
     </Collapsable>
@@ -168,16 +175,12 @@ export function CallReader({
       f.stateMutability === 'view',
   );
 
-  return (
-    <>
-      {properties.map((p, idx) => (
-        <Call
-          address={selectedContract.address as `0x${string}`}
-          property={p}
-          key={idx}
-          typedAbi={typedAbi}
-        />
-      ))}
-    </>
-  );
+  return properties.map((p, idx) => (
+    <Call
+      address={selectedContract.address as `0x${string}`}
+      property={p}
+      key={idx}
+      typedAbi={typedAbi}
+    />
+  ));
 }
