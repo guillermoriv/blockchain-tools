@@ -2,7 +2,16 @@
 
 import { RainbowKitProvider, darkTheme } from '@rainbow-me/rainbowkit';
 import { WagmiConfig, configureChains, createConfig } from 'wagmi';
-import { polygon, arbitrum, arbitrumGoerli } from 'wagmi/chains';
+import {
+  polygon,
+  arbitrum,
+  arbitrumGoerli,
+  mainnet,
+  bsc,
+  bscTestnet,
+  goerli,
+  polygonMumbai,
+} from 'wagmi/chains';
 import { jsonRpcProvider } from 'wagmi/providers/jsonRpc';
 import {
   injectedWallet,
@@ -18,7 +27,16 @@ import {
 import { connectorsForWallets } from '@rainbow-me/rainbowkit';
 
 const { chains, publicClient } = configureChains(
-  [polygon, arbitrum, arbitrumGoerli],
+  [
+    polygon,
+    arbitrum,
+    arbitrumGoerli,
+    mainnet,
+    bsc,
+    bscTestnet,
+    goerli,
+    polygonMumbai,
+  ],
   [
     jsonRpcProvider({
       rpc: (chain) => {
@@ -28,7 +46,7 @@ const { chains, publicClient } = configureChains(
   ],
 );
 
-const projectId = 'be96f3154a4bbc8744b43d4f9d956088';
+const projectId = 'd236b226ea7396de2556d33c49ea1538';
 
 const connectors = connectorsForWallets([
   {
@@ -36,7 +54,7 @@ const connectors = connectorsForWallets([
     wallets: [
       injectedWallet({ chains }),
       metaMaskWallet({ chains, projectId }),
-      coinbaseWallet({ chains, appName: 'PariFi - dApp' }),
+      coinbaseWallet({ chains, appName: 'Blockchain - Tools' }),
       rabbyWallet({ chains }),
       trustWallet({ chains, projectId }),
       safeWallet({ chains }),
