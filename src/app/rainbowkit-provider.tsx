@@ -11,6 +11,12 @@ import {
   bscTestnet,
   goerli,
   polygonMumbai,
+  avalanche,
+  avalancheFuji,
+  fantom,
+  fantomTestnet,
+  moonbeam,
+  moonriver,
 } from 'wagmi/chains';
 import { jsonRpcProvider } from 'wagmi/providers/jsonRpc';
 import {
@@ -36,6 +42,12 @@ const { chains, publicClient } = configureChains(
     bscTestnet,
     goerli,
     polygonMumbai,
+    avalanche,
+    avalancheFuji,
+    fantom,
+    fantomTestnet,
+    moonbeam,
+    moonriver,
   ],
   [
     jsonRpcProvider({

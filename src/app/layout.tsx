@@ -5,6 +5,13 @@ import { RainbowkitProvider } from './rainbowkit-provider';
 
 import '@rainbow-me/rainbowkit/styles.css';
 import 'react-tooltip/dist/react-tooltip.css';
+import { Metadata } from 'next';
+
+export const metadata: Metadata = {
+  title: 'Blockchain - Tools',
+  description:
+    'Blockchain tools is a page to help you with your blockchain needs, from checking your balance to interacting with smart contracts.',
+};
 
 export default function RootLayout({
   children,
