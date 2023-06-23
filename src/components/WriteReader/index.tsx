@@ -1,50 +1,47 @@
 import { ImportedContract } from '@/app/store-provider';
-import { copyToClipboard } from '@/utils/copyToClipboard';
-import { useMutation } from '@tanstack/react-query';
-import {
-  Contract,
-  ContractReceipt,
-  ContractTransaction,
-  providers,
-  utils,
-} from 'ethers';
 import { useState } from 'react';
 import { MdExpandLess, MdExpandMore } from 'react-icons/md';
-import { useSigner } from 'wagmi';
 import { Collapsable } from '../Collapsable';
 import { FormRow } from '../FormRow';
+import { parseAbiStringToJson } from '@/utils/parseAbiStringToJson';
+import { ParsedAbi } from '@/types/parsedAbi';
+import { Abi, TransactionReceipt } from 'viem';
+import {
+  useContractWrite,
+  usePrepareContractWrite,
+  useWaitForTransaction,
+} from 'wagmi';
+import clsx from 'clsx';
 
-function Call({
-  property,
-  contractInstance,
-}: {
-  property: utils.FunctionFragment;
-  contractInstance: Contract;
-}) {
-  const [receipt, setReceipt] = useState<ContractReceipt | null>(null);
+type CallProps = {
+  property: ParsedAbi;
+  address: `0x${string}`;
+  typedAbi: Abi;
+};
+
+function Call({ property, address, typedAbi }: CallProps) {
+  const [receipt, setReceipt] = useState<TransactionReceipt | null>(null);
   const [inputs, setInputs] = useState<string[]>(
     new Array(property.inputs.length).fill(''),
   );
 
-  async function callWrite() {
-    setReceipt(null);
-
-    try {
-      const tx = (await contractInstance.functions[property.name](
-        ...inputs.map((i) => i.trim()),
-      )) as ContractTransaction;
-
-      const receipt = await tx.wait();
-      setReceipt(receipt);
-    } catch (error) {
-      console.log(error);
-    }
-  }
-
-  const call = useMutation({
-    mutationFn: callWrite,
-    mutationKey: ['callWrite', property.name],
+  const { config } = usePrepareContractWrite({
+    address,
+    abi: typedAbi,
+    functionName: property.name,
+    args: inputs,
   });
+
+  const { write, data, isLoading: loadingWrite } = useContractWrite(config);
+
+  const { isLoading: loadingTxWait } = useWaitForTransaction({
+    hash: data?.hash,
+    onSuccess: (receipt) => {
+      setReceipt(receipt);
+    },
+  });
+
+  const loadingTx = loadingTxWait || loadingWrite;
 
   return (
     <Collapsable
@@ -84,25 +81,28 @@ function Call({
         ))}
 
         <button
-          className="border border-black px-4 py-1 hover:bg-black hover:text-white rounded-md"
-          onClick={() => call.mutate()}
-          disabled={call.isLoading}
+          className={clsx(
+            'border border-black px-4 py-1 hover:bg-black hover:text-white rounded-md',
+            loadingTx && 'pointer-events-none opacity-50',
+          )}
+          onClick={() => write?.()}
+          disabled={loadingTx}
         >
           Write
         </button>
         {receipt && (
           <div className="text-xs flex justify-between items-center mt-6 bg-gray-100 rounded-md p-4">
             <div>
-              {receipt.status === 1 && (
+              {receipt.status === 'success' && (
                 <span className="text-green-500">Transaction Confirmed!</span>
               )}
-              {receipt.status === 2 && (
+              {receipt.status === 'reverted' && (
                 <span className="text-red-500">Transaction Failed!</span>
               )}
               <button
                 className="bg-black active:bg-white active:text-black text-white border border-black py-1 px-2 rounded-md ml-2"
                 onClick={() =>
-                  copyToClipboard(JSON.stringify(receipt, null, 2))
+                  navigator.clipboard.writeText(receipt.transactionHash)
                 }
               >
                 Copy Receipt
@@ -120,31 +120,28 @@ function Call({
 
 export function WriteReader({
   selectedContract,
-  contractIFace,
 }: {
   selectedContract: ImportedContract;
-  contractIFace: utils.Interface;
 }) {
-  const { data: signerProvider } = useSigner();
+  const { parsedAbi, typedAbi } = parseAbiStringToJson(selectedContract.abi);
 
-  const contractInstance = new Contract(
-    selectedContract.address,
-    selectedContract.abi,
-    signerProvider as providers.JsonRpcSigner,
-  );
-  const properties = (
-    contractIFace.fragments as utils.FunctionFragment[]
-  ).filter(
+  const properties = parsedAbi.filter(
     (f) =>
-      f.inputs.length > 0 &&
+      f.stateMutability &&
       f.type === 'function' &&
+      f.inputs.length > 0 &&
       f.stateMutability === 'nonpayable',
   );
 
   return (
     <>
       {properties.map((p) => (
-        <Call property={p} key={p.name} contractInstance={contractInstance} />
+        <Call
+          property={p}
+          key={p.name}
+          typedAbi={typedAbi}
+          address={selectedContract.address as `0x${string}`}
+        />
       ))}
     </>
   );

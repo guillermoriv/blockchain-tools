@@ -1,8 +1,10 @@
 import './../styles/global.scss';
 import { GasProvider } from './gas-provider';
-import { QueryProvider } from './query-provider';
 import { StoreProvider } from './store-provider';
-import { WagmiProvider } from './wagmi-provider';
+import { RainbowkitProvider } from './rainbowkit-provider';
+
+import '@rainbow-me/rainbowkit/styles.css';
+import 'react-tooltip/dist/react-tooltip.css';
 
 export default function RootLayout({
   children,
@@ -17,13 +19,11 @@ export default function RootLayout({
       */}
       <head />
       <body>
-        <WagmiProvider>
-          <QueryProvider>
-            <GasProvider>
-              <StoreProvider>{children}</StoreProvider>
-            </GasProvider>
-          </QueryProvider>
-        </WagmiProvider>
+        <RainbowkitProvider>
+          <GasProvider>
+            <StoreProvider>{children}</StoreProvider>
+          </GasProvider>
+        </RainbowkitProvider>
       </body>
     </html>
   );

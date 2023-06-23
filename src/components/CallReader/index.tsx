@@ -1,65 +1,109 @@
 import { ImportedContract } from '@/app/store-provider';
-import { copyToClipboard } from '@/utils/copyToClipboard';
-import { toFormat, toStringFormat } from '@/utils/format';
-import { useMutation } from '@tanstack/react-query';
-import { Contract, utils } from 'ethers';
+import { toFormat } from '@/utils/format';
 import { useState } from 'react';
 import { MdExpandLess, MdExpandMore } from 'react-icons/md';
-import { useProvider } from 'wagmi';
 import { Collapsable } from '../Collapsable';
 import { FormRow } from '../FormRow';
+import type { ParsedAbi } from '@/types/parsedAbi';
+import { useContractRead } from 'wagmi';
+import { parseAbiStringToJson } from '@/utils/parseAbiStringToJson';
+import { Abi } from 'viem';
+import { Tooltip } from 'react-tooltip';
 
-function Call({
-  property,
-  contractInstance,
-}: {
-  property: utils.FunctionFragment;
-  contractInstance: Contract;
-}) {
-  const [outputP, setOutputP] = useState<any[]>([]);
+function DisplayData({ data }: { data: any }) {
+  const renderData = () => {
+    if (Array.isArray(data)) {
+      return (
+        <ul className="space-y-1">
+          {data.map((value, index) => (
+            <li key={index} className="text-sm text-gray-700">
+              <DisplayData data={value} />
+            </li>
+          ))}
+        </ul>
+      );
+    }
+
+    if (typeof data === 'object' && data !== null) {
+      return (
+        <ul className="space-y-1">
+          {Object.keys(data).map((key) => (
+            <li key={key} className="text-sm text-gray-700">
+              <strong className="font-semibold">{key}: </strong>
+              <DisplayData data={data[key]} />
+            </li>
+          ))}
+        </ul>
+      );
+    }
+
+    return (
+      <div
+        className="px-2 py-1 rounded-md bg-gray-100 text-sm text-gray-700"
+        onClick={(e) => {
+          const currentTarget = e.currentTarget;
+
+          currentTarget.setAttribute('data-tooltip-content', 'Copied!');
+
+          navigator.clipboard
+            .writeText(data)
+            .then(() =>
+              setTimeout(
+                () =>
+                  currentTarget.setAttribute(
+                    'data-tooltip-content',
+                    'Copy transaction hash',
+                  ),
+                1500,
+              ),
+            )
+            .catch((err) => {
+              console.error('Could not copy text: ', err);
+            });
+        }}
+        data-tooltip-id="copy-data"
+        data-tooltip-content="Copy"
+      >
+        {data}
+        <Tooltip id="copy-data" />
+      </div>
+    );
+  };
+
+  return <div>{renderData()}</div>;
+}
+
+type CallProps = {
+  property: ParsedAbi;
+  address: `0x${string}`;
+  typedAbi: Abi;
+};
+
+function Call({ property, address, typedAbi }: CallProps) {
+  const [outputP, setOutputP] = useState<any | null>(null);
   const [inputs, setInputs] = useState<string[]>(
     new Array(property.inputs.length).fill(''),
   );
 
-  async function callRead() {
-    try {
-      const result = await contractInstance.functions[property.name](
-        ...inputs.map((i) => i.trim()),
-      );
+  const { refetch, error } = useContractRead({
+    address,
+    abi: typedAbi,
+    functionName: property.name,
+    enabled: false,
+    args: inputs,
+    onSuccess: (result) => {
       setOutputP(result);
-    } catch (error) {
-      console.log(error);
-    }
-  }
-
-  const call = useMutation({
-    mutationFn: callRead,
-    mutationKey: ['callRead', property.name],
+    },
   });
-
-  function generateOutputs() {
-    return outputP.map((output, outputIndex) => {
-      return (
-        <tr className="bg-gray-100 border-b" key={property.name}>
-          <td className="text-sm text-gray-900 font-light px-6 py-4 whitespace-nowrap">
-            {property.outputs![outputIndex].name || 'output' + outputIndex}
-          </td>
-          <td
-            className="text-sm text-gray-900 font-light px-6 py-4 whitespace-nowrap"
-            title={toStringFormat(output)}
-            onClick={() => copyToClipboard(toStringFormat(output))}
-          >
-            {toFormat(output)}
-          </td>
-        </tr>
-      );
-    });
-  }
 
   return (
     <Collapsable
       className="mb-2"
       key={property.name}
+      reset={() => {
+        setOutputP(null);
+        setInputs(new Array(property.inputs.length).fill(''));
+      }}
       header={
         <div className="flex items-center px-4 py-3 text-sm border border-gray-100 rounded cursor-pointer bg-gray-50 collapsable-expanded:rounded-b-none">
           <div className="flex-initial w-64">{property.name}</div>
@@ -95,40 +139,15 @@ function Call({
 
         <button
           className="border border-black px-4 py-1 hover:bg-black hover:text-white rounded-md"
-          onClick={() => call.mutate()}
+          onClick={() => refetch()}
         >
           Read
         </button>
 
-        {outputP.length > 0 && (
-          <div className="flex flex-col rounded-md border border-black mt-10">
-            <div className="overflow-x-auto sm:-mx-6 lg:-mx-8">
-              <div className="py-2 inline-block min-w-full sm:px-6 lg:px-8">
-                <div className="overflow-hidden">
-                  <table className="min-w-full">
-                    <thead className="bg-white border-b">
-                      <tr>
-                        <th
-                          scope="col"
-                          className="text-sm font-medium text-gray-900 px-6 py-4 text-left"
-                        >
-                          Output Name
-                        </th>
-                        <th
-                          scope="col"
-                          className="text-sm font-medium text-gray-900 px-6 py-4 text-left"
-                        >
-                          Value
-                        </th>
-                      </tr>
-                    </thead>
-                    <tbody>{generateOutputs()}</tbody>
-                  </table>
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
+        <hr className="border-t border-gray-200 my-2" />
+
+        {outputP && <DisplayData data={outputP} />}
+        {error && <div>{error.message}</div>}
       </div>
     </Collapsable>
   );
@@ -136,31 +155,28 @@ function Call({
 
 export function CallReader({
   selectedContract,
-  contractIFace,
 }: {
   selectedContract: ImportedContract;
-  contractIFace: utils.Interface;
 }) {
-  const provider = useProvider();
+  const { parsedAbi, typedAbi } = parseAbiStringToJson(selectedContract.abi);
 
-  const contractInstance = new Contract(
-    selectedContract.address,
-    selectedContract.abi,
-    provider,
-  );
-  const properties = (
-    contractIFace.fragments as utils.FunctionFragment[]
-  ).filter(
+  const properties = parsedAbi.filter(
     (f) =>
       f.inputs.length > 0 &&
       f.type === 'function' &&
+      f.stateMutability &&
       f.stateMutability === 'view',
   );
 
   return (
     <>
-      {properties.map((p) => (
-        <Call property={p} key={p.name} contractInstance={contractInstance} />
+      {properties.map((p, idx) => (
+        <Call
+          address={selectedContract.address as `0x${string}`}
+          property={p}
+          key={idx}
+          typedAbi={typedAbi}
+        />
       ))}
     </>
   );

@@ -1,6 +1,6 @@
 'use client';
 
-import { WalletButton } from '../WalletButton';
+import { ConnectButton } from '@rainbow-me/rainbowkit';
 import Link from 'next/link';
 
 export function Header() {
@@ -17,7 +17,7 @@ export function Header() {
         </ul>
       </div>
       <div className="flex items-center">
-        <WalletButton />
+        <ConnectButton />
       </div>
     </div>
   );

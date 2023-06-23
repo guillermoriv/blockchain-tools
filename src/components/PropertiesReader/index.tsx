@@ -1,74 +1,39 @@
 import { ImportedContract } from '@/app/store-provider';
-import { copyToClipboard } from '@/utils/copyToClipboard';
 import { toFormat, toStringFormat } from '@/utils/format';
-import { useQuery } from '@tanstack/react-query';
-import { Contract, ContractFunction, utils } from 'ethers';
-import { useNetwork, useProvider } from 'wagmi';
+import { parseAbiStringToJson } from '@/utils/parseAbiStringToJson';
+import { useContractReads } from 'wagmi';
 
 export function PropertiesReader({
   selectedContract,
-  contractIFace,
 }: {
   selectedContract: ImportedContract;
-  contractIFace: utils.Interface;
 }) {
-  const provider = useProvider();
-  const { chain } = useNetwork();
-  const properties = (
-    contractIFace.fragments as utils.FunctionFragment[]
-  ).filter(
+  const { parsedAbi, typedAbi } = parseAbiStringToJson(selectedContract.abi);
+
+  const properties = parsedAbi.filter(
     (f) =>
-      f.inputs.length === 0 &&
+      f.stateMutability &&
       f.type === 'function' &&
-      f.stateMutability === 'view',
+      f.stateMutability === 'view' &&
+      f.inputs.length === 0 &&
+      f.name,
   );
 
-  async function fetchProperty(func: ContractFunction) {
-    try {
-      const result = await func();
-      return result;
-    } catch (e: any) {
-      console.error(e);
-      return e.reason || e.message || 'Unknown error';
-    }
-  }
+  const propertiesCalls = properties.map((p) => ({
+    address: selectedContract.address as `0x${string}`,
+    abi: typedAbi,
+    functionName: p.name,
+  }));
 
-  async function fetchProperties(): Promise<any[][]> {
-    const contract = new Contract(
-      selectedContract.address,
-      selectedContract.abi,
-      provider,
-    );
-
-    const funcs = (contractIFace.fragments as utils.FunctionFragment[]).filter(
-      (f) =>
-        f.inputs.length === 0 &&
-        f.type === 'function' &&
-        f.stateMutability === 'view',
-    );
-
-    const propertiesPR = funcs.map((func) =>
-      fetchProperty(contract.functions[func.name]),
-    );
-
-    return await Promise.all(propertiesPR);
-  }
-
-  const { data: outputsP, isLoading } = useQuery<any[][]>({
-    queryKey: ['fetchedProperties', selectedContract.address],
-    queryFn: fetchProperties,
-    enabled:
-      !!contractIFace &&
-      !!chain &&
-      !!selectedContract &&
-      chain.id === selectedContract.chainId &&
-      !!provider,
-    staleTime: 1000 * 60 * 5,
+  const { data: outputsP } = useContractReads({
+    contracts: propertiesCalls,
   });
 
   function generateOutputs() {
+    if (!outputsP) return [];
+
     return properties.map((p, idx) => {
-      const currentValue = outputsP![idx][0];
+      const currentValue = outputsP[idx].result;
 
       return (
         <tr className="bg-gray-100 border-b" key={p.name}>
@@ -78,16 +43,18 @@ export function PropertiesReader({
           <td
             className="text-sm text-gray-900 font-light px-6 py-4 whitespace-nowrap"
             title={toStringFormat(currentValue)}
-            onClick={() => copyToClipboard(toStringFormat(currentValue))}
+            onClick={() =>
+              navigator.clipboard.writeText(toStringFormat(currentValue))
+            }
           >
-            {toFormat(currentValue)}
+            {currentValue !== undefined ? toFormat(currentValue) : 'N/A'}
           </td>
         </tr>
       );
     });
   }
 
-  return !isLoading ? (
+  return (
     <div className="flex flex-col rounded-md border border-black mt-10">
       <div className="overflow-x-auto sm:-mx-6 lg:-mx-8">
         <div className="py-2 inline-block min-w-full sm:px-6 lg:px-8">
@@ -115,7 +82,5 @@ export function PropertiesReader({
         </div>
       </div>
     </div>
-  ) : (
-    <div>Loading...</div>
   );
 }

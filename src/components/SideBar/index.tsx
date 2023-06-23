@@ -5,7 +5,6 @@ import { MouseEvent, useState } from 'react';
 import { FormContract } from '../FormContract';
 import { AiOutlineArrowUp } from 'react-icons/ai';
 import { clamp } from '@/utils/clamp';
-import { copyToClipboard } from '@/utils/copyToClipboard';
 
 export function SideBar() {
   const { contracts, selectedContract, removeContract, setSelectedContract } =
@@ -93,7 +92,7 @@ export function SideBar() {
               <p>{contract.name}</p>
               <p
                 className="hover:underline hover:cursor-pointer"
-                onClick={() => copyToClipboard(contract.address)}
+                onClick={() => navigator.clipboard.writeText(contract.address)}
               >
                 {clamp(contract.address, 12)}
               </p>

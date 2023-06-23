@@ -2,12 +2,10 @@
 
 import { useStore } from '@/app/store-provider';
 import { useAccount, useNetwork } from 'wagmi';
-import { utils } from 'ethers';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { PropertiesReader } from '../PropertiesReader';
 import { CallReader } from '../CallReader';
 import { WriteReader } from '../WriteReader';
-import { copyToClipboard } from '@/utils/copyToClipboard';
 
 enum FilterReader {
   READ = 'read',
@@ -22,24 +20,8 @@ export function ContractReader() {
   const { selectedContract } = useStore();
 
   const [filter, setFilter] = useState<FilterReader>(FilterReader.PROPERTIES);
-  const [contractIFace, setContractIFace] = useState<utils.Interface | null>(
-    null,
-  );
 
-  useEffect(() => {
-    if (selectedContract) {
-      try {
-        const iface = new utils.Interface(selectedContract.abi);
-        setContractIFace(iface);
-      } catch (e) {
-        setContractIFace(null);
-      }
-    } else {
-      setContractIFace(null);
-    }
-  }, [selectedContract]);
-
-  return selectedContract && contractIFace ? (
+  return selectedContract ? (
     <div className="container h-screen p-8 overflow-auto">
       {!isConnected ? (
         <div>
@@ -50,7 +32,9 @@ export function ContractReader() {
           <span>This is the current selected contract:</span>
           <span
             className="border border-black hover:bg-black hover:cursor-pointer hover:text-white p-2 ml-2 rounded-md"
-            onClick={() => copyToClipboard(selectedContract.address)}
+            onClick={() =>
+              navigator.clipboard.writeText(selectedContract.address)
+            }
           >
             {selectedContract.address}
           </span>
@@ -81,22 +65,13 @@ export function ContractReader() {
             </li>
           </ul>
           {filter === FilterReader.PROPERTIES && (
-            <PropertiesReader
-              selectedContract={selectedContract}
-              contractIFace={contractIFace}
-            />
+            <PropertiesReader selectedContract={selectedContract} />
           )}
           {filter === FilterReader.READ && (
-            <CallReader
-              selectedContract={selectedContract}
-              contractIFace={contractIFace}
-            />
+            <CallReader selectedContract={selectedContract} />
           )}
           {filter === FilterReader.WRITE && (
-            <WriteReader
-              selectedContract={selectedContract}
-              contractIFace={contractIFace}
-            />
+            <WriteReader selectedContract={selectedContract} />
           )}
         </div>
       ) : (
