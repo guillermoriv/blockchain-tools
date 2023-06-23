@@ -1,7 +1,7 @@
 import { ImportedContract, useStore } from '@/app/store-provider';
-import { MouseEvent, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
+import { isAddress } from 'viem';
 import { useNetwork } from 'wagmi';
-import { utils } from 'ethers';
 
 export function FormContract({
   close,
@@ -100,7 +100,7 @@ export function FormContract({
           }));
 
           // * we verify the address of the contract that's being imported
-          if (!utils.isAddress(e.target.value)) setErrorAddress(true);
+          if (!isAddress(e.target.value)) setErrorAddress(true);
         }}
       />
       <label htmlFor="contract-abi">Contract ABI</label>
